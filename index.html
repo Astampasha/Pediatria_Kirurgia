@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test Site</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
     <div id="openingWindow" class="window active">
         <div class="header">
@@ -14,7 +16,7 @@
                 <span class="dark-mode-icon">🌙</span>
             </button>
         </div>
-        
+
         <div class="concepts-container">
             <div class="concepts-grid">
                 <button class="concept-btn" data-concept="1">
@@ -30,18 +32,32 @@
 
         <div class="parts-container" id="partsContainer" style="display: none;">
             <div class="parts-grid" id="partsGrid">
-                </div>
+            </div>
         </div>
 
         <div class="controls-container">
             <div class="toggle-container" id="toggleContainer" style="display: none;">
                 <label class="toggle-label">
-                    <span>100 suala limitle</span>
+                    <span id="label100">100 suala limitle</span>
                     <input type="checkbox" id="limitQuestions" class="toggle-input">
                     <span class="toggle-slider"></span>
                 </label>
+                <label class="toggle-label">
+                    <span id="label200">200 suala limitle</span>
+                    <input type="checkbox" id="limitQuestions200" class="toggle-input">
+                    <span class="toggle-slider"></span>
+                </label>
+                <label class="toggle-label">
+                    <span id="label500">500 suala limitle</span>
+                    <input type="checkbox" id="limitQuestions500" class="toggle-input">
+                    <span class="toggle-slider"></span>
+                </label>
+                <div class="limit-buttons">
+                    <button id="decreaseLimitBtn" class="action-btn secondary">-50</button>
+                    <button id="increaseLimitBtn" class="action-btn secondary">+50</button>
+                </div>
             </div>
-            
+
             <div class="action-buttons">
                 <button id="selectAllBtn" class="action-btn secondary" style="display: none;">Hamsını seç</button>
                 <button id="startBtn" class="action-btn primary" disabled>Start</button>
@@ -99,4 +115,5 @@
 
     <script src="script.js"></script>
 </body>
+
 </html>
