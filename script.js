@@ -23,6 +23,13 @@ const conceptButtons = document.querySelectorAll('.concept-btn');
 const selectAllBtn = document.getElementById('selectAllBtn');
 const startBtn = document.getElementById('startBtn');
 const limitQuestionsToggle = document.getElementById('limitQuestions');
+const limitQuestions200Toggle = document.getElementById('limitQuestions200');
+const limitQuestions500Toggle = document.getElementById('limitQuestions500');
+const label100 = document.getElementById('label100');
+const label200 = document.getElementById('label200');
+const label500 = document.getElementById('label500');
+const increaseLimitBtn = document.getElementById('increaseLimitBtn');
+const decreaseLimitBtn = document.getElementById('decreaseLimitBtn');
 const toggleContainer = document.getElementById('toggleContainer');
 const darkModeToggle = document.getElementById('darkModeToggle');
 const darkModeToggleTest = document.getElementById('darkModeToggleTest');
@@ -62,7 +69,7 @@ function updateDarkModeIcon(theme) {
 function generateParts() {
     partsGrid.innerHTML = '';
     selectedParts.clear();
-    
+
     const partsToShow = new Set();
     selectedConcepts.forEach(concept => {
         const config = conceptConfig[concept];
@@ -100,20 +107,20 @@ function generateParts() {
             partBtn.dataset.concept = concept;
             partBtn.dataset.part = part;
             partBtn.dataset.partKey = `${concept}-${part}`;
-            
+
             const partName = document.createElement('span');
             partName.className = 'part-name';
             // Use the updated concept label in the button text
             const conceptLabel = conceptConfig[concept].label;
             partName.textContent = `${conceptLabel} - Part ${part}`;
-            
+
             const partQuestions = document.createElement('span');
             partQuestions.className = 'part-questions';
-            
+
             // Logic for displaying the specific question counts
             if (concept === '1' && part === '5') {
-                 // Concept 1, Part 5: 78 sual (CHANGED from 100 sual)
-                partQuestions.textContent = '78 sual'; 
+                // Concept 1, Part 5: 78 sual (CHANGED from 100 sual)
+                partQuestions.textContent = '78 sual';
             } else if (concept === '2' && part === '3') {
                 // Concept 2, Part 3: 49 sual (CHANGED from 100 sual)
                 partQuestions.textContent = '49 sual';
@@ -121,7 +128,7 @@ function generateParts() {
                 // Concept 1, Parts 1-4: 100 sual (assuming default for others in C1)
                 partQuestions.textContent = '100 sual';
             } else if (concept === '2' && part <= '2') {
-                 // Concept 2, Parts 1-2: 100 sual (assuming default for others in C2)
+                // Concept 2, Parts 1-2: 100 sual (assuming default for others in C2)
                 partQuestions.textContent = '100 sual';
             } else {
                 partQuestions.textContent = 'sual';
@@ -130,10 +137,10 @@ function generateParts() {
             // OLD CODE:
             // partQuestions.textContent = concept === '1' && part <= '5' ? '100 sual' : 
             //                                  concept === '2' && part <= '3' ? '100 sual' : 'sual';
-            
+
             partBtn.appendChild(partName);
             partBtn.appendChild(partQuestions);
-            
+
             partBtn.addEventListener('click', () => {
                 const partKey = partBtn.dataset.partKey;
                 if (selectedParts.has(partKey)) {
@@ -146,7 +153,7 @@ function generateParts() {
                 updateStartButton();
                 updateToggleVisibility();
             });
-            
+
             partsGrid.appendChild(partBtn);
         });
     });
@@ -173,9 +180,9 @@ conceptButtons.forEach(btn => {
 // Select all parts
 selectAllBtn.addEventListener('click', () => {
     const allPartButtons = document.querySelectorAll('.part-btn');
-    const allSelected = allPartButtons.length > 0 && 
-                        Array.from(allPartButtons).every(btn => selectedParts.has(btn.dataset.partKey));
-    
+    const allSelected = allPartButtons.length > 0 &&
+        Array.from(allPartButtons).every(btn => selectedParts.has(btn.dataset.partKey));
+
     if (allSelected) {
         selectedParts.clear();
         allPartButtons.forEach(btn => btn.classList.remove('selected'));
@@ -198,12 +205,73 @@ function updateStartButton() {
     selectAllBtn.textContent = selectedParts.size === totalParts && totalParts > 0 ? 'Hamsını seç' : 'Hamsını seç';
 }
 
+
+
+// Limit Configuration
+let currentLimit = 100;
+
+function updateLimitLabels(activeToggle) {
+    // Reset labels
+    label100.textContent = '100 suala limitle';
+    label200.textContent = '200 suala limitle';
+    label500.textContent = '500 suala limitle';
+
+    if (activeToggle && activeToggle.checked) {
+        if (activeToggle === limitQuestionsToggle) label100.textContent = `${currentLimit} suala limitle`;
+        if (activeToggle === limitQuestions200Toggle) label200.textContent = `${currentLimit} suala limitle`;
+        if (activeToggle === limitQuestions500Toggle) label500.textContent = `${currentLimit} suala limitle`;
+    }
+}
+
+function handleLimitToggle(toggle, baseLimit) {
+    if (toggle.checked) {
+        currentLimit = baseLimit;
+        // Uncheck others
+        [limitQuestionsToggle, limitQuestions200Toggle, limitQuestions500Toggle].forEach(t => {
+            if (t !== toggle) t.checked = false;
+        });
+        updateLimitLabels(toggle);
+    } else {
+        updateLimitLabels(null);
+    }
+}
+
+limitQuestionsToggle.addEventListener('change', () => handleLimitToggle(limitQuestionsToggle, 100));
+limitQuestions200Toggle.addEventListener('change', () => handleLimitToggle(limitQuestions200Toggle, 200));
+limitQuestions500Toggle.addEventListener('change', () => handleLimitToggle(limitQuestions500Toggle, 500));
+
+increaseLimitBtn.addEventListener('click', () => {
+    currentLimit += 50;
+    const activeToggle = [limitQuestionsToggle, limitQuestions200Toggle, limitQuestions500Toggle].find(t => t.checked);
+    if (activeToggle) {
+        updateLimitLabels(activeToggle);
+    } else {
+        // Build behavior: if none checked, check 100
+        limitQuestionsToggle.checked = true;
+        updateLimitLabels(limitQuestionsToggle);
+    }
+});
+
+decreaseLimitBtn.addEventListener('click', () => {
+    if (currentLimit > 50) currentLimit -= 50;
+    const activeToggle = [limitQuestionsToggle, limitQuestions200Toggle, limitQuestions500Toggle].find(t => t.checked);
+    if (activeToggle) {
+        updateLimitLabels(activeToggle);
+    } else {
+        limitQuestionsToggle.checked = true;
+        updateLimitLabels(limitQuestionsToggle);
+    }
+});
+
 function updateToggleVisibility() {
     if (selectedParts.size > 1) {
         toggleContainer.style.display = 'block';
     } else {
         toggleContainer.style.display = 'none';
         limitQuestionsToggle.checked = false;
+        limitQuestions200Toggle.checked = false;
+        limitQuestions500Toggle.checked = false;
+        updateLimitLabels(null);
     }
 }
 
@@ -235,10 +303,10 @@ async function loadQuestions() {
                 response = await fetch(`part${testNumber}.json`);
             }
             if (!response.ok) throw new Error(`Failed to load concept${concept}part${part}.js`);
-            
+
             const text = await response.text();
             let data;
-            
+
             try {
                 data = JSON.parse(text);
             } catch (e) {
@@ -249,9 +317,9 @@ async function loadQuestions() {
                     throw new Error('Could not parse file as JSON');
                 }
             }
-            
+
             const questions = Array.isArray(data) ? data : (data.questions || []);
-            
+
             const questionsWithPart = questions.map(q => {
                 return {
                     question: q.question,
@@ -291,8 +359,11 @@ startBtn.addEventListener('click', async () => {
 
     currentQuestions = shuffleArray(allQuestions);
 
-    if (selectedParts.size > 1 && limitQuestionsToggle.checked) {
-        currentQuestions = currentQuestions.slice(0, 100);
+    if (selectedParts.size > 1) {
+        const isLimited = limitQuestionsToggle.checked || limitQuestions200Toggle.checked || limitQuestions500Toggle.checked;
+        if (isLimited) {
+            currentQuestions = currentQuestions.slice(0, currentLimit);
+        }
     }
 
     currentQuestionIndex = 0;
@@ -315,7 +386,7 @@ function displayQuestion() {
     const question = currentQuestions[currentQuestionIndex];
     questionText.textContent = question.question;
     questionNumber.textContent = `Question ${currentQuestionIndex + 1} of ${currentQuestions.length}`;
-    
+
     const progress = ((currentQuestionIndex + 1) / currentQuestions.length) * 100;
     progressFill.style.width = `${progress}%`;
 
@@ -395,6 +466,8 @@ restartBtn.addEventListener('click', () => {
     updateStartButton();
     updateToggleVisibility();
     limitQuestionsToggle.checked = false;
+    limitQuestions200Toggle.checked = false;
+    limitQuestions500Toggle.checked = false;
 
     resultsWindow.classList.remove('active');
     openingWindow.classList.add('active');
